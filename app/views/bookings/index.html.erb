@@ -1,0 +1,63 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>All Bookings</h1>
+      <%= link_to "Book New Rooms", new_booking_path, class: "btn btn-primary" %>
+    </div>
+    
+    <% if @bookings.any? %>
+      <div class="row">
+        <% @bookings.each do |booking| %>
+          <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><%= booking.guest_name %></h5>
+                <small class="text-muted"><%= booking.booking_date.strftime("%b %d, %Y at %I:%M %p") %></small>
+              </div>
+              <div class="card-body">
+                <h6 class="card-title">Booked Rooms:</h6>
+                <div class="mb-3">
+                  <% booking.rooms.order(:floor, :room_number).each do |room| %>
+                    <span class="badge bg-primary me-1 mb-1"><%= room.room_number %></span>
+                  <% end %>
+                </div>
+                
+                <div class="row text-center">
+                  <div class="col-6">
+                    <div class="border-end">
+                      <strong><%= booking.rooms.count %></strong><br>
+                      <small class="text-muted">Rooms</small>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <strong><%= booking.total_travel_time %></strong><br>
+                    <small class="text-muted">Travel Time (min)</small>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                  <%= link_to "View Details", booking_path(booking), class: "btn btn-outline-primary btn-sm" %>
+                  <%= button_to "Cancel Booking", booking_path(booking), method: :delete, 
+                      class: "btn btn-outline-danger btn-sm", 
+                      confirm: "Are you sure you want to cancel this booking?",
+                      data: { turbo_method: :delete } %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-5">
+        <div class="card">
+          <div class="card-body">
+            <h3 class="text-muted">No Bookings Yet</h3>
+            <p class="text-muted">Start by booking some rooms!</p>
+            <%= link_to "Book Rooms Now", new_booking_path, class: "btn btn-primary btn-lg" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,165 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>Hotel Room Visualization</h1>
+      <div>
+        <%= link_to "Book Rooms", new_booking_path, class: "btn btn-primary me-2" %>
+        <%= button_to "Generate Random Occupancy", generate_random_occupancy_rooms_path, method: :post, class: "btn btn-warning me-2", confirm: "This will randomly occupy 30-60% of rooms. Continue?" %>
+        <%= button_to "Reset All Bookings", reset_all_bookings_rooms_path, method: :post, class: "btn btn-danger", confirm: "This will clear all bookings and make all rooms available. Continue?" %>
+      </div>
+    </div>
+    
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Room Statistics</h5>
+            <p class="card-text">
+              <strong>Total Rooms:</strong> <%= @rooms.count %><br>
+              <strong>Available:</strong> <span class="text-success"><%= @rooms.where(available: true).count %></span><br>
+              <strong>Occupied:</strong> <span class="text-danger"><%= @rooms.where(available: false).count %></span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Legend</h5>
+            <p class="card-text">
+              <span class="badge bg-success me-2">Available</span>
+              <span class="badge bg-danger me-2">Occupied</span>
+              <span class="badge bg-primary me-2">Stairs/Lift</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Hotel Building Visualization -->
+    <div class="hotel-building">
+      <% (10.downto(1)).each do |floor| %>
+        <div class="floor mb-3">
+          <div class="row">
+            <div class="col-md-1">
+              <div class="floor-label text-center">
+                <strong>Floor <%= floor %></strong>
+                <div class="stairs-lift">
+                  <div class="stairs">🪜</div>
+                  <div class="lift">🛗</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-11">
+              <div class="rooms-row">
+                <% floor_rooms = @rooms_by_floor[floor] || [] %>
+                <% if floor == 10 %>
+                  <!-- Floor 10 has 7 rooms -->
+                  <% (1..7).each do |room_num| %>
+                    <% room_number = "100#{room_num}" %>
+                    <% room = floor_rooms.find { |r| r.room_number == room_number } %>
+                    <div class="room <%= room&.available? ? 'available' : 'occupied' %>" data-room-id="<%= room&.id %>">
+                      <%= room_number %>
+                    </div>
+                  <% end %>
+                <% else %>
+                  <!-- Floors 1-9 have 10 rooms each -->
+                  <% (1..10).each do |room_num| %>
+                    <% room_number = "#{floor}#{room_num.to_s.rjust(2, '0')}" %>
+                    <% room = floor_rooms.find { |r| r.room_number == room_number } %>
+                    <div class="room <%= room&.available? ? 'available' : 'occupied' %>" data-room-id="<%= room&.id %>">
+                      <%= room_number %>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<style>
+.hotel-building {
+  border: 2px solid #333;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+}
+
+.floor {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.floor-label {
+  background-color: #e9ecef;
+  padding: 10px;
+  border-radius: 5px;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stairs-lift {
+  margin-top: 10px;
+}
+
+.stairs, .lift {
+  font-size: 20px;
+  margin: 2px 0;
+}
+
+.rooms-row {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 80px;
+}
+
+.room {
+  width: 60px;
+  height: 60px;
+  border: 2px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.room.available {
+  background-color: #d4edda;
+  color: #155724;
+  border-color: #28a745;
+}
+
+.room.occupied {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-color: #dc3545;
+}
+
+.room:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 768px) {
+  .room {
+    width: 45px;
+    height: 45px;
+    font-size: 10px;
+  }
+  
+  .rooms-row {
+    gap: 3px;
+  }
+}
+</style>

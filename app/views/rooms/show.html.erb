@@ -1,0 +1,122 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <h3 class="mb-0">Room <%= @room.room_number %></h3>
+          <%= link_to "Back to Rooms", rooms_path, class: "btn btn-outline-secondary" %>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h5>Room Information</h5>
+            <p><strong>Room Number:</strong> <%= @room.room_number %></p>
+            <p><strong>Floor:</strong> <%= @room.floor %></p>
+            <p><strong>Position on Floor:</strong> <%= @room.position_on_floor %></p>
+            <p><strong>Status:</strong> 
+              <span class="badge <%= @room.available? ? 'bg-success' : 'bg-danger' %>">
+                <%= @room.available? ? 'Available' : 'Occupied' %>
+              </span>
+            </p>
+          </div>
+          <div class="col-md-6">
+            <h5>Location Details</h5>
+            <p><strong>Distance from Stairs/Lift:</strong> <%= @room.position_on_floor %> rooms</p>
+            <p><strong>Travel Time from Ground Floor:</strong> <%= (@room.floor - 1) * 2 + (@room.position_on_floor - 1) %> minutes</p>
+          </div>
+        </div>
+        
+        <% unless @room.available? %>
+          <div class="alert alert-warning mt-3">
+            <strong>This room is currently occupied.</strong> Please select an available room for booking.
+          </div>
+        <% end %>
+      </div>
+      <div class="card-footer">
+        <% if @room.available? %>
+          <%= link_to "Book This Room", new_booking_path, class: "btn btn-primary" %>
+        <% else %>
+          <%= link_to "Find Available Rooms", rooms_path, class: "btn btn-outline-primary" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Floor Layout</h5>
+      </div>
+      <div class="card-body">
+        <div class="floor-layout">
+          <div class="stairs-lift-section">
+            <div class="stairs">🪜</div>
+            <div class="lift">🛗</div>
+          </div>
+          <div class="rooms-section">
+            <% if @room.floor == 10 %>
+              <% (1..7).each do |room_num| %>
+                <% room_number = "100#{room_num}" %>
+                <div class="room-layout <%= room_number == @room.room_number ? 'current-room' : 'other-room' %>">
+                  <%= room_number %>
+                </div>
+              <% end %>
+            <% else %>
+              <% (1..10).each do |room_num| %>
+                <% room_number = "#{@room.floor}#{room_num.to_s.rjust(2, '0')}" %>
+                <div class="room-layout <%= room_number == @room.room_number ? 'current-room' : 'other-room' %>">
+                  <%= room_number %>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.floor-layout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stairs-lift-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 20px;
+}
+
+.rooms-section {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+
+.room-layout {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 3px;
+}
+
+.room-layout.current-room {
+  background-color: #007bff;
+  color: white;
+  border-color: #0056b3;
+}
+
+.room-layout.other-room {
+  background-color: #e9ecef;
+  color: #6c757d;
+}
+</style>

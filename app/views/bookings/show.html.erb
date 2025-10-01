@@ -1,0 +1,156 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <h3 class="mb-0">Booking Details</h3>
+          <%= link_to "Back to Bookings", bookings_path, class: "btn btn-outline-secondary" %>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <h5>Guest Information</h5>
+            <p><strong>Name:</strong> <%= @booking.guest_name %></p>
+            <p><strong>Booking Date:</strong> <%= @booking.booking_date.strftime("%B %d, %Y at %I:%M %p") %></p>
+          </div>
+          <div class="col-md-6">
+            <h5>Booking Summary</h5>
+            <p><strong>Total Rooms:</strong> <%= @booking.rooms.count %></p>
+            <p><strong>Total Travel Time:</strong> <%= @booking.total_travel_time %> minutes</p>
+          </div>
+        </div>
+        
+        <h5>Booked Rooms</h5>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Room Number</th>
+                <th>Floor</th>
+                <th>Position on Floor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @booking.rooms.order(:floor, :room_number).each do |room| %>
+                <tr>
+                  <td><span class="badge bg-primary"><%= room.room_number %></span></td>
+                  <td>Floor <%= room.floor %></td>
+                  <td>Position <%= room.position_on_floor %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+        
+        <% if @booking.rooms.count > 1 %>
+          <h5>Travel Time Breakdown</h5>
+          <div class="alert alert-info">
+            <strong>Total Travel Time:</strong> <%= @booking.total_travel_time %> minutes<br>
+            <small>This includes both horizontal (1 min/room) and vertical (2 min/floor) travel time between rooms.</small>
+          </div>
+        <% end %>
+      </div>
+      <div class="card-footer">
+        <div class="d-flex justify-content-between">
+          <%= link_to "Edit Booking", edit_booking_path(@booking), class: "btn btn-outline-primary" %>
+          <%= button_to "Cancel Booking", booking_path(@booking), method: :delete, 
+              class: "btn btn-outline-danger", 
+              confirm: "Are you sure you want to cancel this booking?",
+              data: { turbo_method: :delete } %>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Room Visualization</h5>
+      </div>
+      <div class="card-body">
+        <div class="rooms-mini-visualization">
+          <% @booking.rooms.group_by(&:floor).sort_by { |floor, _| floor }.reverse.each do |floor, rooms| %>
+            <div class="floor-mini mb-2">
+              <div class="floor-label-mini">
+                <strong>Floor <%= floor %></strong>
+              </div>
+              <div class="rooms-row-mini">
+                <% if floor == 10 %>
+                  <% (1..7).each do |room_num| %>
+                    <% room_number = "100#{room_num}" %>
+                    <% room = rooms.find { |r| r.room_number == room_number } %>
+                    <div class="room-mini <%= room ? 'booked' : 'empty' %>">
+                      <%= room_number %>
+                    </div>
+                  <% end %>
+                <% else %>
+                  <% (1..10).each do |room_num| %>
+                    <% room_number = "#{floor}#{room_num.to_s.rjust(2, '0')}" %>
+                    <% room = rooms.find { |r| r.room_number == room_number } %>
+                    <div class="room-mini <%= room ? 'booked' : 'empty' %>">
+                      <%= room_number %>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.rooms-mini-visualization {
+  border: 1px solid #ddd;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+}
+
+.floor-mini {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.floor-label-mini {
+  width: 60px;
+  font-size: 12px;
+  text-align: center;
+  background-color: #e9ecef;
+  padding: 5px;
+  border-radius: 3px;
+  margin-right: 10px;
+}
+
+.rooms-row-mini {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+}
+
+.room-mini {
+  width: 25px;
+  height: 25px;
+  border: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: bold;
+  border-radius: 2px;
+}
+
+.room-mini.booked {
+  background-color: #dc3545;
+  color: white;
+}
+
+.room-mini.empty {
+  background-color: #e9ecef;
+  color: #6c757d;
+}
+</style>

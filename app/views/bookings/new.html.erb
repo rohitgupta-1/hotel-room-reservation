@@ -1,0 +1,71 @@
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="mb-0">Book Hotel Rooms</h3>
+      </div>
+      <div class="card-body">
+        <%= form_with url: bookings_path, method: :post, local: true, class: "needs-validation", novalidate: true do |form| %>
+          <div class="mb-3">
+            <%= form.label :guest_name, "Guest Name", class: "form-label" %>
+            <%= form.text_field :guest_name, class: "form-control", required: true, placeholder: "Enter your name" %>
+            <div class="invalid-feedback">
+              Please provide a valid guest name.
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <%= form.label :room_count, "Number of Rooms (1-5)", class: "form-label" %>
+            <%= form.number_field :room_count, class: "form-control", min: 1, max: 5, required: true, placeholder: "Enter number of rooms" %>
+            <div class="invalid-feedback">
+              Please enter a number between 1 and 5.
+            </div>
+            <div class="form-text">
+              You can book up to 5 rooms at a time. The system will automatically select the optimal rooms to minimize travel time.
+            </div>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <%= form.submit "Find Optimal Rooms", class: "btn btn-primary btn-lg" %>
+            <%= link_to "Cancel", rooms_path, class: "btn btn-secondary btn-lg" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5 class="mb-0">Booking Rules</h5>
+      </div>
+      <div class="card-body">
+        <ul class="list-unstyled">
+          <li><strong>✓</strong> Priority is given to rooms on the same floor</li>
+          <li><strong>✓</strong> If same floor is not available, rooms are selected to minimize travel time</li>
+          <li><strong>✓</strong> Travel time calculation:</li>
+          <li class="ms-3">• Horizontal: 1 minute per room</li>
+          <li class="ms-3">• Vertical: 2 minutes per floor</li>
+          <li><strong>✓</strong> Maximum 5 rooms per booking</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Bootstrap form validation
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
