@@ -2,7 +2,7 @@ class BookingsController < ApplicationController
   before_action :set_booking, only: [:show, :destroy]
   
   def index
-    @bookings = Booking.includes(:rooms).order(created_at: :desc)
+    @bookings = Booking.order(created_at: :desc)
   end
   
   def new
